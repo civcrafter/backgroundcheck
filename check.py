@@ -51,6 +51,7 @@ if __name__ == "__main__":
                     already_checked.append(player)
 
                     if len(submissions) > 0:
+                        logging.info("found {} submissions mentioning player '{}'".format(len(submissions), player))
                         summary = "WARNING: {}\n".format(player)
                         body = "\n".join(check_player(player))
                         Notify.Notification.new(summary, body).show()
