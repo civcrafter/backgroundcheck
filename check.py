@@ -8,14 +8,16 @@ import gi
 gi.require_version("Notify", "0.7")
 from gi.repository import Notify
 
-SUBREDDIT = "Devoted+Civcraft"
+SUBREDDITS = ["Devoted", "Civcraft"]
 SEARCHSTRING = "{}"
 LOGPATH = "{}/.minecraft/logs/latest.log".format(env["HOME"])
 
 def check_player(player):
     searchstring = SEARCHSTRING.format(player)
+    subreddits = "+".join(SUBREDDITS)
     r = praw.Reddit(user_agent='my_cool_application')
-    results = list(r.search(searchstring, subreddit=SUBREDDIT, sort="new", limit=None))
+    logging.info("Searching '{}' in '{}'".format(searchstring, subreddits))
+    results = list(r.search(searchstring, subreddit=subreddits, sort="new", limit=None))
 
     return [result.title for result in results]
 
@@ -40,20 +42,20 @@ if __name__ == "__main__":
 
                 if re.match(snitchlog_regex, line.split("[CHAT]")[1]) :
                     chatline = line.split("[CHAT]")[1].strip()
-                    logging.info("matching chat line: \"{}\"".format(chatline))
+                    logging.debug("Matching chat line: \"{}\"".format(chatline))
                     player = chatline.split()[1]
                     if player in already_checked:
-                        logging.info("player '{}' already checked".format(player))
+                        logging.info("Already done a background check on {}, ignoring..".format(player))
                         continue
 
-                    logging.info("checking player '{}'".format(player))
+                    logging.info("Checking background of {}".format(player))
                     submissions = check_player(player)
                     already_checked.append(player)
 
                     if len(submissions) > 0:
-                        logging.info("found {} submissions mentioning player '{}'".format(len(submissions), player))
-                        summary = "WARNING: {}\n".format(player)
-                        body = "\n".join(check_player(player))
+                        logging.info("Found {} submission(s) mentioning {}".format(len(submissions), player))
+                        summary = "Civcraft Background check found submissions mentioning {}".format(player)
+                        body = "\n".join(["• '{}'".format(s) for s in submissions])
                         Notify.Notification.new(summary, body).show()
                     else:
-                        logging.info("No submissions found for player '{}'".format(player))
+                        logging.info("No posts found mentioning {}".format(player))
