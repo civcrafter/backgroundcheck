@@ -54,7 +54,8 @@ if __name__ == "__main__":
 
                     if len(submissions) > 0:
                         logging.info("Found {} submission(s) mentioning {}".format(len(submissions), player))
-                        summary = "Civcraft Background check found submissions mentioning {}".format(player)
+                        #summary = "Civcraft Background check found submissions mentioning {}".format(player)
+                        summary = "Civcraft Background check searched '{}' in [{}] and found {} result(s)".format(SEARCHSTRING.format(player), ",".join(SUBREDDITS), len(submissions))
                         body = "\n".join(["• '{}'".format(s) for s in submissions])
                         Notify.Notification.new(summary, body).show()
                     else:
